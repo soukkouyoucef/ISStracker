@@ -142,7 +142,7 @@
                 //console.log(myArr);
                 
                 //the API isn't that powerful , Have to check for when cannot reverse-geocode
-                if (myArr.address.City == ""){
+                if (typeof myArr === 'undefined'){
                     //locality.innerHTML = myArr.address.Match_addr;
                     country.innerHTML = "Riding Over Sea or Ocean";
                 }else { //Fetched City and Country Code With Success 
