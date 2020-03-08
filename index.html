@@ -108,10 +108,14 @@
         '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
       // Tiles URL
       const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+      
+      //Currently used Reverse Geo-coding API 
+      var ndGeoAPI = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=4.366281%2C50.851994&langCode=fr&outSR=&forStorage=false&f=json";
+      
       //Reverse Geo-Location API 01 URL (Initial long,lat Values Point to Libya)
-      var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location=32.8829717,13.1708262&includeRoadMetadata=true&includeNearestIntersection=true';
+      /*var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location=32.8829717,13.1708262&includeRoadMetadata=true&includeNearestIntersection=true'; */
      //Reverse Geo-Location API 02 URL 
-     var ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=32.8829717&longitude=13.1708262&localityLanguage=en';
+     //var ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=32.8829717&longitude=13.1708262&localityLanguage=en';
      
       // Showing exact map tile coordinates and zoom level
       const mymap = L.map("mapid");
@@ -136,13 +140,25 @@
             if (this.readyState == 4 && this.status == 200) {
                 var myArr = JSON.parse(this.responseText);
                 //console.log(myArr);
-                locality.innerHTML = myArr.locality;
-                country.innerHTML = myArr.countryCode;
+                
+                //the API isn't that powerful , Have to check for when cannot reverse-geocode
+                if (myArr.address.City == ""){
+                    locality.innerHTML = myArr.address.Match_addr;
+                    country.innerHTML = "Riding Over Sea or Ocean";
+                }else { //Fetched City and Country Code With Success 
+                       locality.innerHTML = myArr.address.City;
+                       country.innerHTML = myArr.address.CountryCode;
+                }
+            
+                   
+                
+                
             }
         };
         xmlhttp.open("GET", APIURL, true);
         xmlhttp.send();
     }
+    //getCountry(ndGeoAPI);
   
     
       async function getISSPos() {
@@ -160,7 +176,7 @@
         latii = latitude;
         /*var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location='+latitude+','+longitude+'&includeRoadMetadata=true&includeNearestIntersection=true';*/
         //Updating  Reverse GeoCoding API parameters
-        ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=en';
+        ndGeoAPI = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location="+longitude+","+latitude+"&langCode=en&f=json";
         getCountry(ndGeoAPI);
         vlct.innerHTML = velocity / 1000;
         if (viewFlag == true){
