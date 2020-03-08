@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ISS real-time Position</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+      integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+      crossorigin=""
+    ></script>
+    <style>
+      #mapid {
+        height: 400px;
+        width: 1024px;
+      }
+    </style>
+  </head>
+  <body>
+    <h4>
+      ISS API data provided by
+      <a href="https://wheretheiss.at/">@BILL SHUPP </a>
+    </h4>
+    <h2>Where is the ISS ?</h2>
+    <p>
+      Longitude : <span id="long"></span><br />
+      Latitude : <span id="lat"></span> <br />
+      Speed : <span id="velocity"></span> km/h
+    </p>
+    <div id="mapid">
+      <!-- Leaflet.js map div -->
+    </div>
+
+    <h4>
+      Created by
+      <a href="https://www.facebook.com/DrJoeSk">Youcef Soukkou</a> 2020
+    </h4>
+    <h4>
+      Based on a video series by :
+      <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw"
+        >@The Coding Train !
+      </a>
+    </h4>
+    <script>
+      // Just Global Variables
+      let url = "https://api.wheretheiss.at/v1/satellites/25544";
+      var long = document.getElementById("long");
+      var lat = document.getElementById("lat");
+      var vlct = document.getElementById("velocity");
+      //CC Attribution to the openstreetmap.org
+      const attribution =
+        '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
+      // Tiles URL
+      const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+      // Showing exact map tile coordinates and zoom level
+      const mymap = L.map("mapid");
+      const tiles = L.tileLayer(tileUrl, { attribution });
+
+      //Adding tiles to map
+      tiles.addTo(mymap);
+
+      //ISS Icon
+      var ISSicon = L.icon({
+        iconUrl: "Orbital_Station-512.png",
+        iconSize: [180, 72],
+        iconAnchor: [90, 36]
+      });
+      //Adding ISS position marker
+      var marker = L.marker([0, 0], { icon: ISSicon }).addTo(mymap);
+
+      async function getISSPos() {
+        //Getting a response from the API
+        var APIresponse = await fetch(url);
+        //Creating a JSON Object from the response
+        var responseJSON = await APIresponse.json();
+        var { longitude, latitude, velocity } = responseJSON;
+        //Displaying the Longitude & Latitude
+        long.innerHTML = longitude;
+        lat.innerHTML = latitude;
+        vlct.innerHTML = velocity / 1000;
+        //Setting a dynamic view of the map (Updates when the ISS changes Position)
+        mymap.setView([latitude, longitude], 5);
+        //Updating the Marker(ISS Icon) Position on the map
+        marker.setLatLng([latitude, longitude]);
+      }
+      //Main Function
+      getISSPos();
+      //Refreshing the Position by calling the main function each 1000ms
+      window.setInterval(getISSPos, 1000);
+    </script>
+  </body>
+</html>
