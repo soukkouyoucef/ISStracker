@@ -143,7 +143,7 @@
                 
                 //the API isn't that powerful , Have to check for when cannot reverse-geocode
                 if (myArr.address.City == ""){
-                    locality.innerHTML = myArr.address.Match_addr;
+                    //locality.innerHTML = myArr.address.Match_addr;
                     country.innerHTML = "Riding Over Sea or Ocean";
                 }else { //Fetched City and Country Code With Success 
                        locality.innerHTML = myArr.address.City;
@@ -176,7 +176,7 @@
         latii = latitude;
         /*var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location='+latitude+','+longitude+'&includeRoadMetadata=true&includeNearestIntersection=true';*/
         //Updating  Reverse GeoCoding API parameters
-        ndGeoAPI = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location="+longitude+","+latitude+"&langCode=en&f=json";
+        ndGeoAPI = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location="+lngt+","+latii+"&langCode=en&f=json";
         getCountry(ndGeoAPI);
         vlct.innerHTML = velocity / 1000;
         if (viewFlag == true){
