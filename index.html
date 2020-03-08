@@ -21,15 +21,13 @@
     </style>
   </head>
   <body>
-    <h4>
-      ISS API data provided by
-      <a href="https://wheretheiss.at/" target="_blank">@BILL SHUPP </a>
-    </h4>
+    
     <h2>Where is the ISS ?</h2>
     <p>
       Longitude : <span id="long"></span><br />
       Latitude : <span id="lat"></span> <br />
-      Speed : <span id="velocity"></span> km/h
+      Speed : <span id="velocity"></span> km/h <br />
+      Current Country : <span id="country"></span> | Locality : <span id="locality"> </span>
     </p>
     <div id="mapid">
       <!-- Leaflet.js map div -->
@@ -37,13 +35,17 @@
 
     <h4>
       Created by
-      <a href="https://www.facebook.com/DrJoeSk" target="_blank">Youcef Soukkou</a> 2020
+      <a href="https://www.facebook.com/DrJoeSk" target="_blank">Youcef Soukkou</a>
     </h4>
     <h4>
       Based on a video series by :
-      <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw"
-        target="_blank">@The Coding Train !
+      <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw" target="_blank"
+        >@The Coding Train !
       </a>
+    </h4>
+    <h4>
+      ISS API data provided by
+      <a href="https://wheretheiss.at/" target="_blank">@BILL SHUPP </a>
     </h4>
     <script>
       // Just Global Variables
@@ -51,12 +53,19 @@
       var long = document.getElementById("long");
       var lat = document.getElementById("lat");
       var vlct = document.getElementById("velocity");
+      var locality = document.getElementById("locality");
+      var country = document.getElementById("country");
+
       //CC Attribution to the openstreetmap.org
       const attribution =
         '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
       // Tiles URL
       const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-
+      //Reverse Geo-Location API 01 URL (Initial long,lat Values Point to Libya)
+      var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location=32.8829717,13.1708262&includeRoadMetadata=true&includeNearestIntersection=true';
+     //Reverse Geo-Location API 02 URL 
+     var ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=32.8829717&longitude=13.1708262&localityLanguage=en';
+     
       // Showing exact map tile coordinates and zoom level
       const mymap = L.map("mapid");
       const tiles = L.tileLayer(tileUrl, { attribution });
@@ -67,21 +76,42 @@
       //ISS Icon
       var ISSicon = L.icon({
         iconUrl: "Orbital_Station-512.png",
-        iconSize: [180, 72],
-        iconAnchor: [90, 36]
+        iconSize: [120, 46],
+        iconAnchor: [60, 23]
       });
       //Adding ISS position marker
       var marker = L.marker([0, 0], { icon: ISSicon }).addTo(mymap);
 
+    //Reverse Geo-Coding API Request 
+    function getCountry(APIURL){
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var myArr = JSON.parse(this.responseText);
+                //console.log(myArr);
+                locality.innerHTML = myArr.locality;
+                country.innerHTML = myArr.countryCode;
+            }
+        };
+        xmlhttp.open("GET", APIURL, true);
+        xmlhttp.send();
+    }
+  
+
       async function getISSPos() {
         //Getting a response from the API
         var APIresponse = await fetch(url);
+    
         //Creating a JSON Object from the response
         var responseJSON = await APIresponse.json();
         var { longitude, latitude, velocity } = responseJSON;
         //Displaying the Longitude & Latitude
         long.innerHTML = longitude;
         lat.innerHTML = latitude;
+        /*var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location='+latitude+','+longitude+'&includeRoadMetadata=true&includeNearestIntersection=true';*/
+        //Updating  Reverse GeoCoding API parameters
+        ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=en';
+        getCountry(ndGeoAPI);
         vlct.innerHTML = velocity / 1000;
         //Setting a dynamic view of the map (Updates when the ISS changes Position)
         mymap.setView([latitude, longitude], 5);
@@ -92,6 +122,9 @@
       getISSPos();
       //Refreshing the Position by calling the main function each 1000ms
       window.setInterval(getISSPos, 1000);
+       
+      
+      
     </script>
   </body>
 </html>
