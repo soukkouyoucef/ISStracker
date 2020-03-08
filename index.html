@@ -13,40 +13,84 @@
       integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
       crossorigin=""
     ></script>
+    <script data-ad-client="ca-pub-4901343832473067" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <style>
       #mapid {
-        height: 400px;
+        height: 100%;
         width: 100%;
+        position:absolute;
+        top:0%;
+        left:0%;
+        z-index:0;
+        
+        
       }
+      #p_z_index{
+          background-color:rgba(7,54,66,0.7);
+          padding:20px;
+          color:#fff;
+          position:absolute;
+          z-index:1;
+          height:auto;
+          width:auto;
+          top: 80%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+      }
+      #title_div{
+          position:absolute;
+          top:0%;
+          left:0%;
+          z-index:2;
+          text-align: center;
+          width:100%;
+          height:auto;
+      }
+      a{
+          color:rgba(255,255,255,0.8);
+      }
+      #titleH1{
+          -webkit-box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
+      }
+      
     </style>
   </head>
   <body>
-    
-    <h2>Where is the ISS ?</h2>
-    <p>
-      Longitude : <span id="long"></span><br />
-      Latitude : <span id="lat"></span> <br />
-      Speed : <span id="velocity"></span> km/h <br />
-      Current Country : <span id="country"></span> | Locality : <span id="locality"> </span>
-    </p>
+    <div id="title_div">
+        <h1 id="titleH1">Where is the ISS Now ?</h1>
+        <h3 id="subTitleH3">
+            Created by <a href="https://www.facebook.com/DrJoeSk" style='color:black;' target="_blank">Youcef Soukkou</a>
+        </h3>
+    </div>     
+   <div id="p_z_index">
+       <b>
+              <button onclick="resetViewISS()">Reset View to ISS </button><br />
+              Longitude : <span id="long"></span><br />
+              Latitude : <span id="lat"></span> <br />
+              Speed : <span id="velocity"></span> km/h <br />
+              Current Country : <span id="country"></span> |<br />
+              Locality : <span id="locality"> </span>
+              
+               <h4>
+                  Based on a video series by :
+                  <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw" target="_blank"
+                    >@The Coding Train !
+                  </a>
+                  <br />
+                  ISS API data provided by
+                  <a href="https://wheretheiss.at/" target="_blank">@BILL SHUPP </a>
+                </h4>
+        </b>
+
+    </div>
     <div id="mapid">
+        
       <!-- Leaflet.js map div -->
     </div>
-
-    <h4>
-      Created by
-      <a href="https://www.facebook.com/DrJoeSk" target="_blank">Youcef Soukkou</a>
-    </h4>
-    <h4>
-      Based on a video series by :
-      <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw" target="_blank"
-        >@The Coding Train !
-      </a>
-    </h4>
-    <h4>
-      ISS API data provided by
-      <a href="https://wheretheiss.at/" target="_blank">@BILL SHUPP </a>
-    </h4>
+    
+    
     <script>
       // Just Global Variables
       let url = "https://api.wheretheiss.at/v1/satellites/25544";
@@ -55,7 +99,10 @@
       var vlct = document.getElementById("velocity");
       var locality = document.getElementById("locality");
       var country = document.getElementById("country");
-
+      var viewFlag = true;
+      //Global Position tracker Variables
+      var lngt = 0;
+      var latii = 0; 
       //CC Attribution to the openstreetmap.org
       const attribution =
         '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
@@ -97,7 +144,7 @@
         xmlhttp.send();
     }
   
-
+    
       async function getISSPos() {
         //Getting a response from the API
         var APIresponse = await fetch(url);
@@ -108,23 +155,35 @@
         //Displaying the Longitude & Latitude
         long.innerHTML = longitude;
         lat.innerHTML = latitude;
+        //Changing global variables of longitude and lattitude (to be usedby the reset View to ISS function)
+        lngt = longitude;
+        latii = latitude;
         /*var CAPIurl =  'https://open.mapquestapi.com/geocoding/v1/reverse?key=mKGPAbgm7MavwAX91jv8Ow9fnYEalArQ&location='+latitude+','+longitude+'&includeRoadMetadata=true&includeNearestIntersection=true';*/
         //Updating  Reverse GeoCoding API parameters
         ndGeoAPI = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=en';
         getCountry(ndGeoAPI);
         vlct.innerHTML = velocity / 1000;
-        //Setting a dynamic view of the map (Updates when the ISS changes Position)
-        mymap.setView([latitude, longitude], 5);
+        if (viewFlag == true){
+                //Setting a dynamic view of the map (Updates when the ISS changes Position)
+                 mymap.setView([latitude, longitude], 5);
+                 viewFlag = false;
+        }
         //Updating the Marker(ISS Icon) Position on the map
         marker.setLatLng([latitude, longitude]);
       }
       //Main Function
       getISSPos();
+      
+      function resetViewISS(){
+        mymap.setView([latii, lngt], 5);
+        }
+      
       //Refreshing the Position by calling the main function each 1000ms
       window.setInterval(getISSPos, 1000);
        
       
       
     </script>
+    
   </body>
 </html>
