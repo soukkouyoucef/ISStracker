@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>ISS real-time Position</title>
+    <link rel="icon" href="favicon.ico">
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
@@ -39,41 +40,46 @@
       }
       #title_div{
           position:absolute;
-          top:0%;
-          left:0%;
+         
           z-index:2;
           text-align: center;
-          width:100%;
+          left: 50%;
+          transform: translateX(-50%);
           height:auto;
       }
       a{
           color:rgba(255,255,255,0.8);
       }
       #titleH1{
-          -webkit-box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
-            -moz-box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
-            box-shadow: 0px 0px 53px 1px rgba(0,0,0,0.75);
+         text-transform: uppercase;
+    	background: linear-gradient(to right, #30CFD0 0%, #330867 100%);
+    	-webkit-background-clip: text;
+    	-webkit-text-fill-color: transparent;
+    	font: {
+    		size: 20vw;
+    		
+    	};
       }
       
     </style>
   </head>
   <body>
     <div id="title_div">
-        <h1 id="titleH1">Where is the ISS Now ?</h1>
-        <h3 id="subTitleH3">
-            Created by <a href="https://www.facebook.com/DrJoeSk" style='color:black;' target="_blank">Youcef Soukkou</a>
-        </h3>
+        <h1 id="titleH1">Where is the ISS Now ?</h1> Created by <a href="https://www.facebook.com/DrJoeSk" style='color:black;' target="_blank">Youcef Soukkou</a>
+        
     </div>     
    <div id="p_z_index">
        <b>
-              <button onclick="resetViewISS()">Reset View to ISS </button><br />
+              <input type="image" value="Reset View to ISS" onclick="resetViewISS()" src="678111-map-marker-512.png" /><br />
+
+              <!-- <button >Reset View to ISS </button><br /> -->
               Longitude : <span id="long"></span><br />
               Latitude : <span id="lat"></span> <br />
               Speed : <span id="velocity"></span> km/h <br />
               Current Country : <span id="country"></span> |<br />
-              Locality : <span id="locality"> </span>
+              Locality : <span id="locality"> </span><br />
               
-               <h4>
+               
                   Based on a video series by :
                   <a href="https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw" target="_blank"
                     >@The Coding Train !
@@ -81,7 +87,6 @@
                   <br />
                   ISS API data provided by
                   <a href="https://wheretheiss.at/" target="_blank">@BILL SHUPP </a>
-                </h4>
         </b>
 
     </div>
@@ -140,19 +145,21 @@
             if (this.readyState == 4 && this.status == 200) {
                 var myArr = JSON.parse(this.responseText);
                 //console.log(myArr);
-                
-                //the API isn't that powerful , Have to check for when cannot reverse-geocode
-                if (typeof myArr === 'undefined'){
-                    //locality.innerHTML = myArr.address.Match_addr;
-                    country.innerHTML = "Riding Over Sea or Ocean";
-                }else { //Fetched City and Country Code With Success 
+                if (typeof myArr.address === "undefined") 
+                { //Couldn't get Information 
+                     // console.log("Can't find object that holds place information");
+                     //the API isn't that powerful , Have to check for when cannot reverse-geocode
+                    
+                    country.innerHTML = "... ";
+                    locality.innerHTML = "Currenlty Above Sea or Ocean";
+                }else {
+                    //Fetched City and Country Code 
                        locality.innerHTML = myArr.address.City;
                        country.innerHTML = myArr.address.CountryCode;
                 }
+                        
+                
             
-                   
-                
-                
             }
         };
         xmlhttp.open("GET", APIURL, true);
